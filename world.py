@@ -1,17 +1,13 @@
 import numpy as np
 from typing import Dict
 
-# ===============================
-# Cell types
-# ===============================
+
 EMPTY = 0
 WALL = 1
 SHELF = 2
 DROP = 3
 
-# ===============================
-# Actions
-# ===============================
+
 STAY = 0
 UP = 1
 DOWN = 2
@@ -44,9 +40,6 @@ class World:
 
         self._build_fixed_world()
 
-    # =================================================
-    # FIXED PROFESSIONAL WAREHOUSE LAYOUT
-    # =================================================
 
     def _build_fixed_world(self):
 
@@ -70,11 +63,11 @@ class World:
             for c in range(2, self.width-2):
                 self.grid[r, c] = WALL
 
-        # vertical divider
+        
         for r in range(2, self.height-2):
             self.grid[r, 6] = WALL
 
-        # open gates
+       
         self.grid[4, 3] = EMPTY
         self.grid[7, 8] = EMPTY
         self.grid[6, 6] = EMPTY
@@ -112,9 +105,6 @@ class World:
             self.robots[rid] = starts[i]
             self.carrying[rid] = False
 
-    # =================================================
-    # STEP FUNCTION
-    # =================================================
 
     def step(self, actions: Dict[str, int]):
 
@@ -137,7 +127,6 @@ class World:
             else:
                 proposed[rid] = (x, y)
 
-        # -------- Collision resolution --------
         final = {}
         collisions = set()
 
@@ -162,7 +151,7 @@ class World:
             picked = False
             dropped = False
 
-            # -------- PICK --------
+            
             if actions[rid] == PICK:
                 shelf = self._adjacent_shelf((x,y))
 
@@ -174,7 +163,6 @@ class World:
                 else:
                     r -= 0.3
 
-            # -------- DROP --------
             if actions[rid] == DROP_ACT:
 
                 if (x,y) in self.drop_points and self.carrying[rid]:
@@ -198,9 +186,6 @@ class World:
 
         return rewards, info
 
-    # =================================================
-    # OBSERVATION
-    # =================================================
 
     def get_local_observation(self, rid, view_size=5):
 
@@ -237,8 +222,7 @@ class World:
 
         return obs
 
-    # =================================================
-
+   
     def _adjacent_shelf(self, pos):
 
         x,y = pos
@@ -251,7 +235,7 @@ class World:
     def _valid(self,x,y):
         return self.grid[x,y] not in [WALL,SHELF]
 
-    # =================================================
+   
 
     def reset(self):
         self.__init__(self.height,self.width,self.n_robots)
@@ -296,3 +280,4 @@ class World:
             disp[x,y]=str(i)
 
         return "\n".join("".join(r) for r in disp)
+
