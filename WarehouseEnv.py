@@ -32,19 +32,19 @@ class WarehouseEnv(ParallelEnv):
         self.view_size = view_size
         self.render_mode = render_mode
 
-        # ✅ World (FIXED MAP)
+    
         self.world = World(height, width, n_robots)
 
-        # Agents
+        
         self.possible_agents = [f"robot_{i}" for i in range(n_robots)]
         self.agents = self.possible_agents[:]
 
-        # Action space
+        
         self._action_spaces = {
             agent: spaces.Discrete(7) for agent in self.possible_agents
         }
 
-        # Observation space
+       
         self._observation_spaces = {
             agent: spaces.Box(
                 low=0, high=1,
@@ -56,7 +56,7 @@ class WarehouseEnv(ParallelEnv):
 
         self.current_step = 0
 
-        # Renderer
+       
         self.renderer = None
         if render_mode in ["human", "rgb_array"]:
             try:
@@ -154,3 +154,4 @@ class WarehouseEnv(ParallelEnv):
 
     def get_global_state(self):
         return self.world.get_global_state()
+
