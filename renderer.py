@@ -3,7 +3,7 @@ import numpy as np
 from typing import Dict, Optional, Tuple
 
 
-# Assuming World is imported
+
 from world import World, EMPTY, WALL, SHELF, DROP
 
 class WarehouseRenderer:
@@ -18,7 +18,7 @@ class WarehouseRenderer:
     - Screenshot capability
     """
 
-    # Colors (RGB)
+   
     COLORS = {
         'background': (240, 240, 240),  # Light gray
         'grid': (200, 200, 200),  # Grid lines
@@ -31,7 +31,7 @@ class WarehouseRenderer:
         'text_bg': (255, 255, 255, 220),  # Semi-transparent white
     }
 
-    # Robot colors for multi-agent (when more than 1 robot)
+    
     ROBOT_COLORS = [
         (70, 130, 180),  # Steel blue
         (220, 20, 60),  # Crimson
@@ -72,26 +72,26 @@ class WarehouseRenderer:
         self.show_grid = show_grid
         self.show_metrics = show_metrics
 
-        # Calculate window size
+        
         self.width = world.width * cell_size
         self.height = world.height * cell_size
         self.metrics_height = 120 if show_metrics else 0
 
-        # Create window
+        
         self.screen = pygame.display.set_mode(
             (self.width, self.height + self.metrics_height)
         )
         pygame.display.set_caption("Multi-Agent Warehouse")
 
-        # Fonts
+        
         self.font = pygame.font.SysFont('Arial', 16)
         self.font_small = pygame.font.SysFont('Arial', 12)
         self.font_large = pygame.font.SysFont('Arial', 24, bold=True)
 
-        # Clock for FPS
+        
         self.clock = pygame.time.Clock()
 
-        # Assign colors to robots
+        
         self.robot_colors = {}
         for i, robot_id in enumerate(world.robots.keys()):
             self.robot_colors[robot_id] = self.ROBOT_COLORS[i % len(self.ROBOT_COLORS)]
@@ -106,7 +106,7 @@ class WarehouseRenderer:
         Returns:
             False if user closed window, True otherwise
         """
-        # Handle pygame events
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
@@ -116,26 +116,26 @@ class WarehouseRenderer:
                 elif event.key == pygame.K_s:
                     self.save_screenshot()
 
-        # Clear screen
+        
         self.screen.fill(self.COLORS['background'])
 
-        # Draw grid
+      
         self._draw_grid()
 
-        # Draw static entities (walls, shelves, drops)
+        
         self._draw_static_entities()
 
-        # Draw robots
+        
         self._draw_robots()
 
-        # Draw metrics overlay
+        
         if self.show_metrics:
             self._draw_metrics()
 
-        # Update display
+        
         pygame.display.flip()
 
-        # Control FPS
+        
         if pause_ms:
             pygame.time.wait(pause_ms)
         else:
@@ -179,22 +179,22 @@ class WarehouseRenderer:
                     self.cell_size
                 )
 
-                if cell_type == 1:  # WALL
+                if cell_type == 1:  
                     pygame.draw.rect(self.screen, self.COLORS['wall'], rect)
-                elif cell_type == 2:  # SHELF
+                elif cell_type == 2:  
                     pygame.draw.rect(self.screen, self.COLORS['shelf'], rect)
-                    # Draw 'S' on shelf
+                    
                     text = self.font.render('S', True, (255, 255, 255))
                     text_rect = text.get_rect(center=rect.center)
                     self.screen.blit(text, text_rect)
 
-                    # Show inventory count
+                    
                     inventory = self.world.shelf_inventory.get((x, y), 0)
                     inv_text = self.font_small.render(str(inventory), True, (255, 255, 255))
                     inv_rect = inv_text.get_rect(bottomright=(rect.right - 3, rect.bottom - 3))
                     self.screen.blit(inv_text, inv_rect)
 
-                elif cell_type == 3:  # DROP
+                elif cell_type == 3:  
                     pygame.draw.rect(self.screen, self.COLORS['drop'], rect)
                     # Draw 'D' on drop point
                     text = self.font.render('D', True, (255, 255, 255))
@@ -204,17 +204,17 @@ class WarehouseRenderer:
     def _draw_robots(self):
         """Draw robots with different colors based on carrying status"""
         for robot_id, (x, y) in self.world.robots.items():
-            # Get robot color
+            
             base_color = self.robot_colors[robot_id]
 
-            # Modify color if carrying
+            
             if self.world.carrying[robot_id]:
-                # Brighten and shift to orange
+                
                 color = self.COLORS['robot_carrying']
             else:
                 color = base_color
 
-            # Calculate position
+           
             rect = pygame.Rect(
                 y * self.cell_size + 5,
                 x * self.cell_size + 5,
@@ -222,22 +222,22 @@ class WarehouseRenderer:
                 self.cell_size - 10
             )
 
-            # Draw robot as circle
+            
             center = rect.center
             radius = (self.cell_size - 10) // 2
             pygame.draw.circle(self.screen, color, center, radius)
 
-            # Draw border
+           
             border_color = tuple(max(0, c - 50) for c in color)
             pygame.draw.circle(self.screen, border_color, center, radius, 2)
 
-            # Draw robot ID
+            
             robot_num = robot_id.split('_')[1]
             text = self.font_small.render(robot_num, True, (255, 255, 255))
             text_rect = text.get_rect(center=center)
             self.screen.blit(text, text_rect)
 
-            # Draw carrying indicator (small box on top)
+            
             if self.world.carrying[robot_id]:
                 box_rect = pygame.Rect(
                     rect.centerx - 5,
@@ -250,16 +250,16 @@ class WarehouseRenderer:
 
     def _draw_metrics(self):
         """Draw metrics overlay at bottom of screen"""
-        # Create semi-transparent background
+        
         metrics_surface = pygame.Surface((self.width, self.metrics_height))
         metrics_surface.fill(self.COLORS['text_bg'][:3])
         metrics_surface.set_alpha(self.COLORS['text_bg'][3])
         self.screen.blit(metrics_surface, (0, self.height))
 
-        # Get metrics
+        
         metrics = self.world.get_metrics()
 
-        # Prepare text
+        
         lines = [
             f"Step: {metrics['step_count']}",
             f"Deliveries: {metrics['total_deliveries']}",
@@ -267,14 +267,14 @@ class WarehouseRenderer:
             f"Efficiency: {metrics['deliveries_per_step']:.3f}",
         ]
 
-        # Draw text
+        
         y_offset = self.height + 10
         for line in lines:
             text = self.font.render(line, True, self.COLORS['text'])
             self.screen.blit(text, (10, y_offset))
             y_offset += 25
 
-        # Draw legend (robot colors)
+        
         legend_x = self.width - 200
         legend_y = self.height + 10
 
@@ -286,7 +286,7 @@ class WarehouseRenderer:
             robot_num = robot_id.split('_')[1]
             carrying = self.world.carrying[robot_id]
 
-            # Draw color circle
+            
             pygame.draw.circle(
                 self.screen,
                 self.COLORS['robot_carrying'] if carrying else color,
@@ -294,7 +294,7 @@ class WarehouseRenderer:
                 8
             )
 
-            # Draw robot label
+            
             status = " (carrying)" if carrying else ""
             text = self.font_small.render(f"Robot {robot_num}{status}", True, self.COLORS['text'])
             self.screen.blit(text, (legend_x + 25, legend_y))
@@ -315,7 +315,7 @@ class WarehouseRenderer:
         pygame.quit()
 
 
-# Standalone test
+
 if __name__ == "__main__":
     import random
     from world import World, STAY, UP, DOWN, LEFT, RIGHT, PICK, DROP_ACT
@@ -326,10 +326,10 @@ if __name__ == "__main__":
     print("  S - Save screenshot")
     print()
 
-    # Create world
+    
     world = World(height=12, width=12, n_robots=3)
 
-    # Create renderer
+    
     renderer = WarehouseRenderer(
         world,
         cell_size=60,
@@ -338,24 +338,24 @@ if __name__ == "__main__":
         show_metrics=True
     )
 
-    # Run simulation
+    
     running = True
     for step in range(200):
         if not running:
             break
 
-        # Random actions
+       
         actions = {}
         for robot_id in world.robots:
             actions[robot_id] = random.randint(0, 6)
 
-        # Step world
+        
         rewards, info = world.step(actions)
 
-        # Render
+       
         running = renderer.render()
 
-        # Print events
+        
         for robot_id, agent_info in info.items():
             if agent_info['picked']:
                 print(f"✓ {robot_id} picked an item!")
@@ -364,7 +364,7 @@ if __name__ == "__main__":
             if agent_info['collision']:
                 print(f"✗ {robot_id} collided!")
 
-        # Reset if episode ends
+        
         if step % 100 == 99:
             print(f"\n{'=' * 50}")
             print(f"Resetting environment...")
@@ -373,4 +373,5 @@ if __name__ == "__main__":
             world.reset()
 
     renderer.close()
+
     print("Done!")
